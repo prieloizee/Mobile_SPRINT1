@@ -1,55 +1,73 @@
-import React from "react";
-import { Link } from "react-router-dom";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import TextField from "@mui/material/TextField";
+import React, {useState} from "react";
+import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, Button } from "react-native";
+import api from '../axios/axios'
 
-function Login() {
-  //Falta implementar a lógica do login, aqui é apenas o layout visual.
-  //Atenção ao axios, Configs do TextField (onchange e values) e o useState
+export default function Login({ navigation }){
+    const [user, setUser] = useState ({ 
+        email: "",
+        password: "",
+    });
 
-  return (
-    <Container component="main" maxWidth="xs">
-      <CssBaseline />
-      <Box display="flex" flexDirection="column" alignItems="center">
-
-        <Typography component="h1" variant="h5">
-          PROJETO BASE - Login
-        </Typography>
-
-        <Box component="form" onSubmit={() => {console.log('Ainda não faz nada')}} noValidate>
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="CPF"
-            type="number"
-            name="cpf"
-            id="cpf"
-          />
-          <TextField
-            margin="normal"
-            required
-            fullWidth
-            label="Senha"
-            type="password"
-            name="password"
-            id="password"
-            autoComplete="current-password"
-          />
-          <Button type="submit" fullWidth variant="contained">
-            Login
-          </Button>
-          <Button fullWidth variant="contained">
-            <Link to="/cadastro">Cadastro</Link>
-          </Button>
-        </Box>
-      </Box>
-    </Container>
-  );
+    async function handleLogin(){
+        await api.postLogin(user).then(
+            (response)=>{
+                Alert.alert("OK", response.data.message);
+            navigation.navigate("Home");
+            },(error)=>{
+                Alert.alert('Erro',error.response.data.error)
+            }
+        )
+    }
+        
+    return(
+        <View style={styles.container}>
+        <Text style={styles.title}> Faça Login</Text>
+        <TextInput 
+        style={styles.input}
+        placeholder="Email"
+        value={user.email}
+        onChangeText={(value)=> {
+            setUser({...user, email: value});
+        }}
+        />
+        <TextInput
+        style={styles.input}
+        placeholder="Senha"
+        value={user.password}
+        onChangeText={(value)=> {
+            setUser({...user, password: value});
+        }}
+        />
+        <TouchableOpacity onPress={handleLogin} style={styles.button}>
+            <Text>Entrar</Text>
+        </TouchableOpacity>
+        <Button title="Cadastro" onPress={()=> navigation.navigate("Cadastro")}/>
+        </View>
+    );
 }
+    const styles = StyleSheet.create({
+        container: {
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center'
+        },
+        title:{
+            fontSize:28,
+            fontWeight:'bold'
+    },
+    input:{
+        width: '100%',
+        height:40,
+        borderBottomWidth:1,
+        marginBottom:20,
+        paddingHorizontal:10
+    },
+    button:{
+        backgroundColor: 'pink',
+        padding:10,
+        borderRadius:5
+    }
+});
 
-export default Login;
+
+    
